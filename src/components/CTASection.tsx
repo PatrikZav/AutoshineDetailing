@@ -131,7 +131,7 @@ export const CTASection: React.FC<CTASectionProps> = ({
               <div className="relative group w-full max-w-md aspect-square rounded-2xl overflow-hidden border border-white/20 shadow-2xl">
                 {/* Generated Square CTA Ceramic Image */}
                 <img
-                  src="/assets/images/autoshine_ceramic_cta.jpg"
+                  src={`${import.meta.env.BASE_URL || '/'}assets/images/autoshine_ceramic_cta.jpg`.replace(/\/+/g, '/')}
                   alt="AutoShine Ceramic Coating Package"
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

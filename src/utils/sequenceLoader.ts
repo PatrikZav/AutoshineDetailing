@@ -70,7 +70,9 @@ export async function loadSequence(
 
       // 1-indexed, 4-digit zero-padded: frame_0001.webp, frame_0002.webp, ...
       const frameNum = String(index + 1).padStart(4, '0');
-      const url = `/assets/sequences/default/frame_${frameNum}.webp`;
+      const baseUrl = import.meta.env.BASE_URL || '/';
+      const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+      const url = `${cleanBase}assets/sequences/default/frame_${frameNum}.webp`;
 
       const notifyLoaded = () => {
         frames[index] = img;
