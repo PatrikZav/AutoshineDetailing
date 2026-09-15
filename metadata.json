@@ -1,0 +1,6 @@
+{
+  "name": "AutoShine Detailing",
+  "description": "A premium mobile and in-studio car detailing service focused on paint correction, ceramic coatings, and showroom-level finishes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

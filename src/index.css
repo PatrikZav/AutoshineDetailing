@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .writing-mode-vertical {
+    writing-mode: vertical-rl;
+  }
+}
+
+html, body {
+  overflow-x: clip;
+  font-family: 'Outfit', sans-serif;
+}
+
