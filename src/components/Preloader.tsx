@@ -28,7 +28,7 @@ export const Preloader: React.FC<PreloaderProps> = ({
             style={{ backgroundColor: themeColor }}
           />
 
-          <div className="relative z-10 flex flex-col items-center max-w-md w-full px-8 text-center">
+          <div className="relative z-10 flex flex-col items-center max-w-xs w-full px-8 text-center">
             {/* Brand Logo & Name */}
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -55,18 +55,8 @@ export const Preloader: React.FC<PreloaderProps> = ({
               </div>
             </motion.div>
 
-            {/* Status info */}
-            <div className="flex items-baseline justify-between w-full mb-3 text-xs font-mono">
-              <span className="text-neutral-400 tracking-wider">
-                LOADING CINEMATIC SEQUENCE
-              </span>
-              <span className="font-semibold text-white tracking-widest text-sm" style={{ color: themeColor }}>
-                {Math.round(progress)}%
-              </span>
-            </div>
-
-            {/* Horizontal Loading Bar */}
-            <div className="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden border border-white/10 relative">
+            {/* Clean, minimal horizontal loading progress line */}
+            <div className="w-full h-1 bg-neutral-900 rounded-full overflow-hidden border border-white/10 relative">
               <motion.div
                 className="h-full rounded-full transition-all duration-150"
                 style={{
@@ -76,11 +66,6 @@ export const Preloader: React.FC<PreloaderProps> = ({
                 }}
               />
             </div>
-
-            {/* Subtext */}
-            <p className="text-[11px] text-neutral-500 mt-4 tracking-widest uppercase font-mono">
-              Pre-rendering studio frames &bull; 60 FPS Parallax
-            </p>
           </div>
         </motion.div>
       )}

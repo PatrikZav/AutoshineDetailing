@@ -50,10 +50,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   const [viewportHeight, setViewportHeight] = useState(() =>
     typeof window !== 'undefined' ? window.innerHeight : 800
   );
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
 
   const frameCount = loadedSequence?.totalFrames || currentPackage.frameCount || 192;
-  // Pinned container height: comfortable scroll distance to scrub smoothly without huge empty gaps
-  const containerHeight = Math.max(viewportHeight * 2.2, 1600);
+  // Pinned container height on desktop; normal full-screen height on mobile
+  const containerHeight = isMobile ? viewportHeight : Math.max(viewportHeight * 2.2, 1600);
 
   // Resize listener for viewport height and canvas pixel resolution
   const updateCanvasDimensions = useCallback(() => {
@@ -96,8 +99,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     }
   }, []); // stable — reads from ref
 
+  // Immediate paint when sequence finishes loading or changes (fixes initial black screen)
+  useEffect(() => {
+    if (loadedSequence && !isMobile) {
+      updateCanvasDimensions();
+      renderFrame(currentFrameRef.current);
+    }
+  }, [loadedSequence, isMobile, renderFrame, updateCanvasDimensions]);
+
   // Parallax Scroll Tracking: Throttled via requestAnimationFrame
-  // This effect only depends on stable refs, so it is mounted ONCE and never torn down during scroll.
   useEffect(() => {
     const updateFrameOnScroll = () => {
       rafIdRef.current = null;
@@ -107,7 +117,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       const rect = container.getBoundingClientRect();
       const totalScrollable = container.offsetHeight - window.innerHeight;
 
-      if (totalScrollable <= 0) return;
+      if (totalScrollable <= 0) {
+        renderFrame(currentFrameRef.current);
+        return;
+      }
 
       // Calculate how far into the pinned container the user has scrolled
       const scrolled = -rect.top;
@@ -137,7 +150,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     };
 
     const handleScroll = () => {
-      // Throttle canvas redraw to once per animation frame
       if (rafIdRef.current === null) {
         rafIdRef.current = requestAnimationFrame(updateFrameOnScroll);
       }
@@ -145,6 +157,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
     const handleResize = () => {
       setViewportHeight(window.innerHeight);
+      setIsMobile(window.innerWidth < 768);
       updateCanvasDimensions();
       if (rafIdRef.current === null) {
         rafIdRef.current = requestAnimationFrame(updateFrameOnScroll);
@@ -169,6 +182,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   }, [renderFrame, updateCanvasDimensions]);
 
   const formattedIndex = String(currentIndex + 1).padStart(2, '0');
+  const baseUrl = import.meta.env.BASE_URL || '/';
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+  const mobilePosterUrl = `${cleanBase}assets/sequences/default/frame_0192.webp`;
 
   return (
     <section
@@ -179,12 +195,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     >
       {/* Sticky Fullscreen Hero Viewport */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between">
-        {/* Background WebP Sequence Canvas: full-bleed cover */}
-        <canvas
-          ref={canvasRef}
-          id="hero-sequence-canvas"
-          className="absolute inset-0 w-full h-full pointer-events-none z-0"
-        />
+        {/* Background: Static WebP image on mobile, interactive Canvas sequence on desktop */}
+        {isMobile ? (
+          <img
+            src={mobilePosterUrl}
+            alt="AutoShine Detailing"
+            className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none z-0"
+          />
+        ) : (
+          <canvas
+            ref={canvasRef}
+            id="hero-sequence-canvas"
+            className="absolute inset-0 w-full h-full pointer-events-none z-0"
+          />
+        )}
 
         {/* Ambient Dark/Light Gradients for Text Contrast without obscuring the center */}
         <div
@@ -418,8 +442,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           {/* Scroll progress cue */}
           <div className="flex items-center gap-2 mb-3 text-[10px] font-mono tracking-[0.25em] uppercase text-neutral-400">
             <ArrowDown className="w-3 h-3 animate-bounce" style={{ color: themeColor }} />
-            <span>Scroll To Scrub Parallax Sequence</span>
-            <span className="text-white font-semibold">({Math.round(scrollProgress * 100)}%)</span>
+            <span>Scroll Down</span>
           </div>
 
           {/* Social icons, minimal and monochrome */}
